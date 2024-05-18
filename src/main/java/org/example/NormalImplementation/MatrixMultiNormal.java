@@ -1,8 +1,15 @@
 package org.example.NormalImplementation;
 
+import org.example.PasoMensaje.Mensajes.Mensaje;
+import org.example.PasoMensaje.Mensajes.ResultMatriz;
+import org.example.PasoMensaje.Productor;
+
 public class MatrixMultiNormal {
 
-    public MatrixMultiNormal() {
+    private final Productor productor;
+
+    public MatrixMultiNormal(Productor productor) {
+        this.productor = productor;
     }
 
     private int calculoSpecifico(int[][] m1, int[][] m2, int size, int pos1, int pos2){
@@ -16,7 +23,7 @@ public class MatrixMultiNormal {
         return result;
     }
 
-    public long multiplyMatrix(int[][] m1, int[][] m2, int size){
+    public void multiplyMatrix(int[][] m1, int[][] m2, int size){
 
         int[][] result = new int[size][size];
 
@@ -32,8 +39,9 @@ public class MatrixMultiNormal {
 
         long fin = System.nanoTime();
 
-        return (fin - inicio);
-
+        ResultMatriz resultMatriz = new ResultMatriz(result, "N", fin - inicio);
+        Mensaje<ResultMatriz> mensaje = new Mensaje<>(resultMatriz);
+        productor.publicar(mensaje);
     }
 
 

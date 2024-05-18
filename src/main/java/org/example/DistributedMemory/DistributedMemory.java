@@ -1,4 +1,4 @@
-package org.example.SharedMemory;
+package org.example.DistributedMemory;
 
 import org.example.PasoMensaje.Mensajes.Mensaje;
 import org.example.PasoMensaje.Mensajes.ResultMatriz;
@@ -7,12 +7,12 @@ import org.example.PasoMensaje.Productor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class SharedMemory {
+public class DistributedMemory {
 
     ExecutorService executor;
     Productor productor;
 
-    public SharedMemory(int threads, Productor productor) {
+    public DistributedMemory(int threads, Productor productor) {
         this.executor = Executors.newFixedThreadPool(threads);
         this.productor = productor;
     }
@@ -33,12 +33,7 @@ public class SharedMemory {
                 int iCal = i;
                 int jCal = j;
                 Runnable calculo = () -> {
-
-                    int rst = 0;
-                    for (int k = 0 ; k < size ; k++){
-                        rst += mat1[iCal][k] * mat2[k][jCal];
-                    }
-                    result[iCal][jCal] = rst;
+                    result[iCal][jCal] = calculoSpecifico(mat1, mat2, size, iCal, jCal);
                 };
 
                 // ejecutando el calculo
@@ -59,11 +54,21 @@ public class SharedMemory {
 
         var fin = System.nanoTime();
 
-        // Retornando tiempo
-        ResultMatriz resultMatriz = new ResultMatriz(result, "S", fin - inicio);
+        ResultMatriz resultMatriz = new ResultMatriz(result, "D", fin - inicio);
         Mensaje<ResultMatriz> mensaje = new Mensaje<>(resultMatriz);
         productor.publicar(mensaje);
+
+    }
+
+
+    private int calculoSpecifico(int[][] mat1, int[][] mat2, int size, int pos1, int pos2){
+
+        int result = 0;
+
+        for (int i = 0 ; i < size ; i++){
+            result += mat1[pos1][i] * mat2[i][pos2];
+        }
+
+        return result;
     }
 }
-
-
